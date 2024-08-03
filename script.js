@@ -44,13 +44,7 @@ async function startCamera() {
             video.setAttribute('crossorigin', 'anonymous');
             
             video.addEventListener('loadedmetadata', () => {
-                if (video.videoHeight > video.videoWidth) {
-                    canvas.width = video.videoHeight;
-                    canvas.height = video.videoWidth;
-                } else {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                }
+                adjustCanvasSize();
             });
         } else {
             console.error("No video devices found.");
@@ -65,17 +59,22 @@ async function startCamera() {
             video.setAttribute('crossorigin', 'anonymous');
 
             video.addEventListener('loadedmetadata', () => {
-                if (video.videoHeight > video.videoWidth) {
-                    canvas.width = video.videoHeight;
-                    canvas.height = video.videoWidth;
-                } else {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                }
+                adjustCanvasSize();
             });
         } catch (fallbackError) {
             console.error("Error accessing the camera with default constraints:", fallbackError);
         }
+    }
+}
+
+function adjustCanvasSize() {
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    if (aspectRatio > 1) { // landscape
+        canvas.width = 1920;
+        canvas.height = 1080;
+    } else { // portrait
+        canvas.width = 1080;
+        canvas.height = 1920;
     }
 }
 
@@ -92,6 +91,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function captureImage() {
+    adjustCanvasSize();
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
