@@ -6,6 +6,10 @@ const postToDiscordButton = document.getElementById('postToDiscordButton');
 const resetButton = document.getElementById('resetButton');
 const videoContainer = document.querySelector('.video-container');
 const canvasContainer = document.querySelector('.canvas-container');
+const modal = document.getElementById('modal');
+const previewButton = document.getElementById('previewButton');
+const postToDiscordModalButton = document.getElementById('postToDiscordModalButton');
+const resetModalButton = document.getElementById('resetModalButton');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
@@ -72,9 +76,24 @@ function adjustCanvasSize() {
 startCamera();
 
 captureButton.addEventListener('click', captureImage);
-video.addEventListener('click', captureImage);
+video.addEventListener('click', () => {
+    if (isMobileDevice()) {
+        modal.style.display = 'flex';
+    } else {
+        captureImage();
+    }
+});
 postToDiscordButton.addEventListener('click', postImageToDiscord);
 resetButton.addEventListener('click', confirmReset);
+previewButton.addEventListener('click', () => {
+    modal.style.display = 'none';
+    captureImage();
+});
+postToDiscordModalButton.addEventListener('click', postImageToDiscord);
+resetModalButton.addEventListener('click', () => {
+    modal.style.display = 'none';
+    confirmReset();
+});
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
