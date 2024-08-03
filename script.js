@@ -19,6 +19,8 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/126913907004762119
 
 let currentStream;
 let usingFrontCamera = true;
+let mediaRecorder;
+let recordedChunks = [];
 
 function isMobileDevice() {
     return /Mobi|Android/i.test(navigator.userAgent);
@@ -118,6 +120,9 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+video.addEventListener('mousedown', startRecording);
+video.addEventListener('mouseup', stopRecording);
+
 function captureImage() {
     if (isMobileDevice() && video.videoWidth > video.videoHeight) {
         canvas.width = video.videoHeight;
@@ -137,6 +142,52 @@ function captureImage() {
     resetButton.classList.remove('hidden');
     captureButton.classList.add('hidden');
     postToDiscordButton.classList.remove('hidden');
+}
+
+function startRecording() {
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(currentStream);
+    mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
+    };
+    mediaRecorder.start();
+}
+
+function stopRecording() {
+    mediaRecorder.stop();
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const file = new File([blob], 'video.webm', { type: 'video/webm' });
+        postVideoToDiscord(file);
+    };
+}
+
+function postVideoToDiscord(file) {
+    const formData = new FormData();
+    formData.append('file', file, 'video.webm');
+
+    const message = messageInput.value;
+    if (message) {
+        formData.append('content', message);
+    }
+
+    axios.post(DISCORD_WEBHOOK_URL, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    })
+    .then(response => {
+        console.log('Posted to Discord:', response.data);
+        alert('Posted to Discord successfully!');
+        const confirmReset = confirm("Do you want to reset the photo booth?");
+        if (confirmReset) resetProcess();
+    })
+    .catch(error => {
+        console.error('Error posting to Discord:', error);
+        alert('Failed to post to Discord. Please try again.');
+    });
 }
 
 function postImageToDiscord() {
