@@ -150,7 +150,8 @@ function captureImage() {
 
 function startRecording() {
     recordedChunks = [];
-    mediaRecorder = new MediaRecorder(currentStream);
+    const options = { mimeType: 'video/mp4' };
+    mediaRecorder = new MediaRecorder(currentStream, options);
     mediaRecorder.ondataavailable = event => {
         if (event.data.size > 0) {
             recordedChunks.push(event.data);
@@ -164,8 +165,8 @@ function stopRecording() {
     mediaRecorder.stop();
     mediaRecorder.onstop = () => {
         recordingIndicator.style.display = 'none';
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const file = new File([blob], 'video.webm', { type: 'video/webm' });
+        const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+        const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
         previewVideo(blob);
     };
 }
@@ -182,7 +183,7 @@ closePreviewButton.addEventListener('click', () => {
 
 function postVideoToDiscord(file) {
     const formData = new FormData();
-    formData.append('file', file, 'video.webm');
+    formData.append('file', file, 'video.mp4');
 
     const message = messageInput.value;
     if (message) {
