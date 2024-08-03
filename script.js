@@ -21,6 +21,7 @@ async function startCamera() {
         if (videoDevices.length > 0) {
             let constraints = {
                 video: {
+                    facingMode: 'user',
                     width: { ideal: 1280 },
                     height: { ideal: 720 },
                     aspectRatio: { ideal: 16 / 9 }
@@ -30,6 +31,7 @@ async function startCamera() {
             if (isMobileDevice()) {
                 constraints = {
                     video: {
+                        facingMode: 'user',
                         width: { ideal: 720 },
                         height: { ideal: 1280 },
                         aspectRatio: { ideal: 9 / 16 }
@@ -44,7 +46,13 @@ async function startCamera() {
             video.setAttribute('crossorigin', 'anonymous');
             
             video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
+                if (isMobileDevice()) {
+                    canvas.width = video.videoHeight;
+                    canvas.height = video.videoWidth;
+                } else {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
             });
         } else {
             console.error("No video devices found.");
@@ -59,22 +67,17 @@ async function startCamera() {
             video.setAttribute('crossorigin', 'anonymous');
 
             video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
+                if (isMobileDevice()) {
+                    canvas.width = video.videoHeight;
+                    canvas.height = video.videoWidth;
+                } else {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
             });
         } catch (fallbackError) {
             console.error("Error accessing the camera with default constraints:", fallbackError);
         }
-    }
-}
-
-function adjustCanvasSize() {
-    const aspectRatio = video.videoWidth / video.videoHeight;
-    if (aspectRatio > 1) { // landscape
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-    } else { // portrait
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
     }
 }
 
@@ -91,21 +94,15 @@ document.addEventListener('keydown', (event) => {
 });
 
 function captureImage() {
-    adjustCanvasSize();
-
-    if (isMobileDevice() && video.videoWidth > video.videoHeight) {
-        canvas.width = video.videoHeight;
-        canvas.height = video.videoWidth;
-
+    if (isMobileDevice()) {
         context.save();
         context.translate(canvas.width / 2, canvas.height / 2);
         context.rotate(Math.PI / 2);
-        context.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
+        context.drawImage(video, -canvas.height / 2, -canvas.width / 2, canvas.height, canvas.width);
         context.restore();
     } else {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
     }
-
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
     resetButton.classList.remove('hidden');
@@ -161,3 +158,4 @@ function dataURLtoFile(dataurl, filename) {
     }
     return new File([u8arr], filename, { type: mime });
 }
+``
