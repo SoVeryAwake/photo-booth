@@ -72,6 +72,7 @@ function adjustCanvasSize() {
 startCamera();
 
 captureButton.addEventListener('click', captureImage);
+video.addEventListener('click', captureImage);
 postToDiscordButton.addEventListener('click', postImageToDiscord);
 resetButton.addEventListener('click', confirmReset);
 
