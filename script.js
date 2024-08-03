@@ -14,17 +14,11 @@ const resetModalButton = document.getElementById('resetModalButton');
 const welcomeModal = document.getElementById('welcomeModal');
 const welcomeButton = document.getElementById('welcomeButton');
 const swapCameraButton = document.getElementById('swapCameraButton');
-const recordingIndicator = document.getElementById('recordingIndicator');
-const videoPreviewModal = document.getElementById('videoPreviewModal');
-const videoPreview = document.getElementById('videoPreview');
-const closePreviewButton = document.getElementById('closePreviewButton');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
 let currentStream;
 let usingFrontCamera = true;
-let mediaRecorder;
-let recordedChunks = [];
 
 function isMobileDevice() {
     return /Mobi|Android/i.test(navigator.userAgent);
@@ -124,9 +118,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-video.addEventListener('mousedown', startRecording);
-video.addEventListener('mouseup', stopRecording);
-
 function captureImage() {
     if (isMobileDevice() && video.videoWidth > video.videoHeight) {
         canvas.width = video.videoHeight;
@@ -146,65 +137,6 @@ function captureImage() {
     resetButton.classList.remove('hidden');
     captureButton.classList.add('hidden');
     postToDiscordButton.classList.remove('hidden');
-}
-
-function startRecording() {
-    recordedChunks = [];
-    const options = { mimeType: 'video/mp4' };
-    mediaRecorder = new MediaRecorder(currentStream, options);
-    mediaRecorder.ondataavailable = event => {
-        if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-        }
-    };
-    mediaRecorder.start();
-    recordingIndicator.style.display = 'block';
-}
-
-function stopRecording() {
-    mediaRecorder.stop();
-    mediaRecorder.onstop = () => {
-        recordingIndicator.style.display = 'none';
-        const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-        const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
-        previewVideo(blob);
-    };
-}
-
-function previewVideo(blob) {
-    const url = URL.createObjectURL(blob);
-    videoPreview.src = url;
-    videoPreviewModal.style.display = 'flex';
-}
-
-closePreviewButton.addEventListener('click', () => {
-    videoPreviewModal.style.display = 'none';
-});
-
-function postVideoToDiscord(file) {
-    const formData = new FormData();
-    formData.append('file', file, 'video.mp4');
-
-    const message = messageInput.value;
-    if (message) {
-        formData.append('content', message);
-    }
-
-    axios.post(DISCORD_WEBHOOK_URL, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        },
-    })
-    .then(response => {
-        console.log('Posted to Discord:', response.data);
-        alert('Posted to Discord successfully!');
-        const confirmReset = confirm("Do you want to reset the photo booth?");
-        if (confirmReset) resetProcess();
-    })
-    .catch(error => {
-        console.error('Error posting to Discord:', error);
-        alert('Failed to post to Discord. Please try again.');
-    });
 }
 
 function postImageToDiscord() {
