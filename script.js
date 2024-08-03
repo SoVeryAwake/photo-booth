@@ -98,6 +98,11 @@ resetModalButton.addEventListener('click', () => {
     modal.style.display = 'none';
     confirmReset();
 });
+canvas.addEventListener('click', () => {
+    if (canvasContainer.classList.contains('hidden') === false) {
+        modal.style.display = 'flex';
+    }
+});
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
