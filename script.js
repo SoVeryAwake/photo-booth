@@ -37,13 +37,21 @@ async function startCamera() {
                 };
                 video.style.height = 'auto';
                 video.style.width = '100%';
-                canvas.width = 1080;
-                canvas.height = 1920;
             }
 
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.setAttribute('crossorigin', 'anonymous');
+            
+            video.addEventListener('loadedmetadata', () => {
+                if (video.videoHeight > video.videoWidth) {
+                    canvas.width = video.videoHeight;
+                    canvas.height = video.videoWidth;
+                } else {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
+            });
         } else {
             console.error("No video devices found.");
         }
@@ -55,6 +63,16 @@ async function startCamera() {
             });
             video.srcObject = fallbackStream;
             video.setAttribute('crossorigin', 'anonymous');
+
+            video.addEventListener('loadedmetadata', () => {
+                if (video.videoHeight > video.videoWidth) {
+                    canvas.width = video.videoHeight;
+                    canvas.height = video.videoWidth;
+                } else {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                }
+            });
         } catch (fallbackError) {
             console.error("Error accessing the camera with default constraints:", fallbackError);
         }
