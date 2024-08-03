@@ -17,11 +17,10 @@ async function startCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
+        
         if (videoDevices.length > 0) {
             let constraints = {
                 video: {
-                    facingMode: 'user',
                     width: { ideal: 1280 },
                     height: { ideal: 720 },
                     aspectRatio: { ideal: 16 / 9 }
@@ -29,7 +28,13 @@ async function startCamera() {
             };
 
             if (isMobileDevice()) {
-                constraints.video.aspectRatio = { ideal: 9 / 16 };
+                constraints = {
+                    video: {
+                        width: { ideal: 720 },
+                        height: { ideal: 1280 },
+                        aspectRatio: { ideal: 9 / 16 }
+                    }
+                };
                 video.style.height = 'auto';
                 video.style.width = '100%';
             }
@@ -37,9 +42,9 @@ async function startCamera() {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.setAttribute('crossorigin', 'anonymous');
-
+            
             video.addEventListener('loadedmetadata', () => {
-                if (isMobileDevice()) {
+                if (video.videoHeight > video.videoWidth) {
                     canvas.width = video.videoHeight;
                     canvas.height = video.videoWidth;
                 } else {
@@ -60,7 +65,7 @@ async function startCamera() {
             video.setAttribute('crossorigin', 'anonymous');
 
             video.addEventListener('loadedmetadata', () => {
-                if (isMobileDevice()) {
+                if (video.videoHeight > video.videoWidth) {
                     canvas.width = video.videoHeight;
                     canvas.height = video.videoWidth;
                 } else {
@@ -87,15 +92,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function captureImage() {
-    if (isMobileDevice() && video.videoWidth > video.videoHeight) {
-        context.save();
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.rotate(Math.PI / 2);
-        context.drawImage(video, -canvas.height / 2, -canvas.width / 2, canvas.height, canvas.width);
-        context.restore();
-    } else {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    }
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
     resetButton.classList.remove('hidden');
