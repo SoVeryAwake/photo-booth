@@ -89,7 +89,11 @@ previewButton.addEventListener('click', () => {
     modal.style.display = 'none';
     captureImage();
 });
-postToDiscordModalButton.addEventListener('click', postImageToDiscord);
+postToDiscordModalButton.addEventListener('click', () => {
+    modal.style.display = 'none';
+    captureImage();
+    postImageToDiscord();
+});
 resetModalButton.addEventListener('click', () => {
     modal.style.display = 'none';
     confirmReset();
