@@ -27,16 +27,14 @@ function isMobileDevice() {
 async function startCamera() {
     const constraints = {
         video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            aspectRatio: { ideal: 16 / 9 },
-            facingMode: usingFrontCamera ? 'user' : 'environment'
-        }
+            width: { ideal: 3840 },
+        height: { ideal: 2160 },
+        aspectRatio: { ideal: 16 / 9 },
+        facingMode: usingFrontCamera ? 'user' : 'environment'
+    }
     };
 
     if (isMobileDevice()) {
-        constraints.video.width = { ideal: 640 };
-        constraints.video.height = { ideal: 480 };
         constraints.video.aspectRatio = { ideal: 9 / 16 };
     }
 
