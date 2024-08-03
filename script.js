@@ -42,10 +42,6 @@ async function startCamera() {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.setAttribute('crossorigin', 'anonymous');
-            
-            video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
-            });
         } else {
             console.error("No video devices found.");
         }
@@ -57,24 +53,9 @@ async function startCamera() {
             });
             video.srcObject = fallbackStream;
             video.setAttribute('crossorigin', 'anonymous');
-
-            video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
-            });
         } catch (fallbackError) {
             console.error("Error accessing the camera with default constraints:", fallbackError);
         }
-    }
-}
-
-function adjustCanvasSize() {
-    const aspectRatio = video.videoWidth / video.videoHeight;
-    if (aspectRatio > 1) { // landscape
-        canvas.width = 1920;
-        canvas.height = 1080;
-    } else { // portrait
-        canvas.width = 1080;
-        canvas.height = 1920;
     }
 }
 
@@ -91,7 +72,10 @@ document.addEventListener('keydown', (event) => {
 });
 
 function captureImage() {
-    adjustCanvasSize();
+    // Set the canvas size to match the video dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
