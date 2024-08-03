@@ -1,34 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Booth App</title>
-    <style>
-        body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f0f0; font-family: Arial, sans-serif; }
-        .container { display: flex; justify-content: center; align-items: center; width: 100%; height: calc(100vh - 60px); }
-        .video-container, .canvas-container { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; }
-        video, canvas { width: auto; height: 100%; max-width: 100%; max-height: 100%; aspect-ratio: 16/9; }
-        .buttons { display: flex; gap: 10px; margin: 10px; align-items: center; }
-        button, select, input { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-        .hidden { display: none; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <div class="video-container">
-            <video id="video" autoplay></video>
-        </div>
-        <div class="canvas-container hidden">
-            <canvas id="canvas" width="3840" height="2160"></canvas>
-        </div>
-    </div>
-    <div class="buttons">
-        <button id="capture">Capture</button>
-        <button id="postToDiscordButton" class="hidden">Post to Discord</button>
-        <button id="resetButton" class="hidden">Reset</button>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+const captureButton = document.getElementById('capture');
+const postToDiscordButton = document.getElementById('postToDiscordButton');
+const resetButton = document.getElementById('resetButton');
+const videoContainer = document.querySelector('.video-container');
+const canvasContainer = document.querySelector('.canvas-container');
+
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
+
+async function startCamera() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        if (videoDevices.length > 0) {
+            const constraints = {
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    aspectRatio: { ideal: 16 / 9 }
+                }
+            };
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            video.setAttribute('crossorigin', 'anonymous');
+        } else {
+            console.error("No video devices found.");
+        }
+    } catch (error) {
+        console.warn("Preferred constraints failed, falling back to default constraints:", error);
+        try {
+            const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
+            video.srcObject = fallbackStream;
+            video.setAttribute('crossorigin', 'anonymous');
+        } catch (fallbackError) {
+            console.error("Error accessing the camera with default constraints:", fallbackError);
+        }
+    }
+}
+
+startCamera();
+
+captureButton.addEventListener('click', captureImage);
+postToDiscordButton.addEventListener('click', postImageToDiscord);
+resetButton.addEventListener('click', confirmReset);
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        captureImage();
+    }
+});
+
+function captureImage() {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    videoContainer.classList.add('hidden');
+    canvasContainer.classList.remove('hidden');
+    resetButton.classList.remove('hidden');
+    captureButton.classList.add('hidden');
+    postToDiscordButton.classList.remove('hidden');
+}
+
+function postImageToDiscord() {
+    const dataURL = canvas.toDataURL('image/png');
+    const file = dataURLtoFile(dataURL, 'image.png');
+    const formData = new FormData();
+    formData.append('file', file, 'image.png');
+
+    axios.post(DISCORD_WEBHOOK_URL, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    })
+    .then(response => {
+        console.log('Posted to Discord:', response.data);
+        alert('Posted to Discord successfully!');
+        const confirmReset = confirm("Do you want to reset the photo booth?");
+        if (confirmReset) resetProcess();
+    })
+    .catch(error => {
+        console.error('Error posting to Discord:', error);
+        alert('Failed to post to Discord. Please try again.');
+    });
+}
+
+function resetProcess() {
+    videoContainer.classList.remove('hidden');
+    canvasContainer.classList.add('hidden');
+    resetButton.classList.add('hidden');
+    captureButton.classList.remove('hidden');
+    postToDiscordButton.classList.add('hidden');
+    context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+}
+
+function confirmReset() {
+    const confirmReset = confirm("Are you sure you want to reset?");
+    if (confirmReset) resetProcess();
+}
+
+function dataURLtoFile(dataurl, filename) {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+}
