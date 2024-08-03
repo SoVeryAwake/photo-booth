@@ -11,6 +11,8 @@ const messageInput = document.getElementById('messageInput');
 const previewButton = document.getElementById('previewButton');
 const postToDiscordModalButton = document.getElementById('postToDiscordModalButton');
 const resetModalButton = document.getElementById('resetModalButton');
+const welcomeModal = document.getElementById('welcomeModal');
+const welcomeButton = document.getElementById('welcomeButton');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
@@ -75,6 +77,14 @@ function adjustCanvasSize() {
 }
 
 startCamera();
+
+if (isMobileDevice()) {
+    welcomeModal.style.display = 'flex';
+}
+
+welcomeButton.addEventListener('click', () => {
+    welcomeModal.style.display = 'none';
+});
 
 captureButton.addEventListener('click', () => {
     captureImage();
