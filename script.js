@@ -158,7 +158,7 @@ function postImageToDiscord() {
     })
     .catch(error => {
         console.error('Error posting to Discord:', error);
-        alert('Failed to post to Discord. Please try again.");
+        alert('Failed to post to Discord. Please try again.');
     });
 }
 
