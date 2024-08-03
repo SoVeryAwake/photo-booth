@@ -12,6 +12,13 @@
         .buttons { display: flex; gap: 10px; margin: 10px; align-items: center; }
         button, select, input { padding: 10px 20px; font-size: 16px; cursor: pointer; }
         .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            video, canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
