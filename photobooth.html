@@ -16,6 +16,8 @@
         .modal-content { background-color: white; padding: 20px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; }
         .modal-button { margin: 10px 0; padding: 10px 20px; font-size: 16px; cursor: pointer; }
         .message-input { width: 100%; margin: 10px 0; padding: 10px; font-size: 16px; }
+        .welcome-modal-content { text-align: center; }
+        .welcome-button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
 
         @media (max-width: 768px) {
             body { height: 100vh; }
@@ -49,6 +51,13 @@
             <button id="previewButton" class="modal-button">Preview</button>
             <button id="postToDiscordModalButton" class="modal-button">Post to Discord</button>
             <button id="resetModalButton" class="modal-button">Reset</button>
+        </div>
+    </div>
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content welcome-modal-content">
+            <p>Welcome to the Hot Alien Summer Camp Photo Booth!</p>
+            <p>Tap the image to capture a photo and follow the prompts to upload automatically to the Photo Booth channel on Discord.</p>
+            <button id="welcomeButton" class="welcome-button">Got it!</button>
         </div>
     </div>
     <script src="script.js"></script>
