@@ -13,82 +13,45 @@ const postToDiscordModalButton = document.getElementById('postToDiscordModalButt
 const resetModalButton = document.getElementById('resetModalButton');
 const welcomeModal = document.getElementById('welcomeModal');
 const welcomeButton = document.getElementById('welcomeButton');
+const swapCameraButton = document.getElementById('swapCameraButton');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
+
+let currentStream;
+let usingFrontCamera = true;
 
 function isMobileDevice() {
     return /Mobi|Android/i.test(navigator.userAgent);
 }
 
 async function startCamera() {
-    try {
-        const constraints = {
-            video: {
-                width: { ideal: 3840 },
-                height: { ideal: 2160 },
-                aspectRatio: { ideal: 16 / 9 }
-            }
-        };
-
-        if (isMobileDevice()) {
-            constraints.video.aspectRatio = { ideal: 9 / 16 };
+    const constraints = {
+        video: {
+            width: { ideal: 3840 },
+            height: { ideal: 2160 },
+            aspectRatio: { ideal: 16 / 9 },
+            facingMode: usingFrontCamera ? 'user' : 'environment'
         }
+    };
 
+    if (isMobileDevice()) {
+        constraints.video.aspectRatio = { ideal: 9 / 16 };
+    }
+
+    try {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
+        currentStream = stream;
         video.setAttribute('crossorigin', 'anonymous');
 
         video.addEventListener('loadedmetadata', () => {
             adjustCanvasSize();
         });
     } catch (error) {
-        console.warn("Preferred 4K resolution failed, falling back to 1080p:", error);
-        try {
-            const constraints = {
-                video: {
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    aspectRatio: { ideal: 16 / 9 }
-                }
-            };
-
-            if (isMobileDevice()) {
-                constraints.video.aspectRatio = { ideal: 9 / 16 };
-            }
-
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            video.setAttribute('crossorigin', 'anonymous');
-
-            video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
-            });
-        } catch (fallbackError) {
-            console.warn("Preferred 1080p resolution failed, falling back to 720p:", fallbackError);
-            try {
-                const constraints = {
-                    video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        aspectRatio: { ideal: 16 / 9 }
-                    }
-                };
-
-                if (isMobileDevice()) {
-                    constraints.video.aspectRatio = { ideal: 9 / 16 };
-                }
-
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-                video.setAttribute('crossorigin', 'anonymous');
-
-                video.addEventListener('loadedmetadata', () => {
-                    adjustCanvasSize();
-                });
-            } catch (finalFallbackError) {
-                console.error("Error accessing the camera with all resolutions:", finalFallbackError);
-            }
-        }
+        console.warn("Preferred resolution failed, falling back to lower resolutions:", error);
     }
 }
 
@@ -106,6 +69,7 @@ startCamera();
 
 if (isMobileDevice()) {
     welcomeModal.style.display = 'flex';
+    swapCameraButton.classList.remove('hidden');
 }
 
 welcomeButton.addEventListener('click', () => {
@@ -141,6 +105,11 @@ canvas.addEventListener('click', () => {
     if (!canvasContainer.classList.contains('hidden')) {
         modal.style.display = 'flex';
     }
+});
+
+swapCameraButton.addEventListener('click', () => {
+    usingFrontCamera = !usingFrontCamera;
+    startCamera();
 });
 
 document.addEventListener('keydown', (event) => {
