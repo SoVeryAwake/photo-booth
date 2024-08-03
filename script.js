@@ -21,20 +21,22 @@ let currentStream;
 let usingFrontCamera = true;
 
 function isMobileDevice() {
-    return /Mobi|Android/i.test(navigator.userAgent);
+    return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 }
 
 async function startCamera() {
     const constraints = {
         video: {
-            width: { ideal: 3840 },
-            height: { ideal: 2160 },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
             aspectRatio: { ideal: 16 / 9 },
             facingMode: usingFrontCamera ? 'user' : 'environment'
         }
     };
 
     if (isMobileDevice()) {
+        constraints.video.width = { ideal: 640 };
+        constraints.video.height = { ideal: 480 };
         constraints.video.aspectRatio = { ideal: 9 / 16 };
     }
 
@@ -57,7 +59,7 @@ async function startCamera() {
             adjustCanvasSize();
         });
     } catch (error) {
-        console.warn("Preferred resolution failed, falling back to lower resolutions:", error);
+        console.error("Error accessing camera:", error);
     }
 }
 
