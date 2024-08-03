@@ -19,7 +19,6 @@
         .welcome-modal-content { text-align: center; }
         .welcome-button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
         .swap-camera-button { position: absolute; bottom: 20px; left: 20px; background-color: rgba(255, 255, 255, 0.5); border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
-        .recording-indicator { position: absolute; top: 10px; left: 10px; width: 20px; height: 20px; background-color: red; border-radius: 50%; display: none; }
 
         @media (max-width: 768px) {
             body { height: 100vh; }
@@ -37,7 +36,6 @@
     <div class="container">
         <div class="video-container">
             <video id="video" autoplay></video>
-            <div id="recordingIndicator" class="recording-indicator"></div>
             <button id="swapCameraButton" class="swap-camera-button hidden">Swap Camera</button>
         </div>
         <div class="canvas-container hidden">
@@ -62,12 +60,6 @@
             <p>Welcome to the Hot Alien Summer Camp Photo Booth!</p>
             <p>Tap the image to capture a photo and follow the prompts to upload automatically to the Photo Booth channel on Discord.</p>
             <button id="welcomeButton" class="welcome-button">Got it!</button>
-        </div>
-    </div>
-    <div id="videoPreviewModal" class="modal">
-        <div class="modal-content">
-            <video id="videoPreview" controls></video>
-            <button id="closePreviewButton" class="modal-button">Close Preview</button>
         </div>
     </div>
     <script src="script.js"></script>
