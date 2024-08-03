@@ -47,6 +47,12 @@ async function startCamera() {
         currentStream = stream;
         video.setAttribute('crossorigin', 'anonymous');
 
+        if (usingFrontCamera) {
+            video.classList.add('flipped');
+        } else {
+            video.classList.remove('flipped');
+        }
+
         video.addEventListener('loadedmetadata', () => {
             adjustCanvasSize();
         });
