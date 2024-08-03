@@ -20,9 +20,9 @@ navigator.mediaDevices.enumerateDevices().then(devices => {
     if (videoDevices.length > 0) {
         const constraints = {
             video: {
-                aspectRatio: 16 / 9,
-                width: { ideal: 3840 },
-                height: { ideal: 2160 }
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                aspectRatio: 16 / 9
             }
         };
 
@@ -32,7 +32,16 @@ navigator.mediaDevices.enumerateDevices().then(devices => {
                 video.setAttribute('crossorigin', 'anonymous'); // Ensure the video is set to allow cross-origin
             })
             .catch(error => {
-                console.error("Error accessing the camera: ", error);
+                console.error("Error accessing the camera with the specified constraints: ", error);
+                // Fallback to default constraints if the specified constraints fail
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.setAttribute('crossorigin', 'anonymous');
+                    })
+                    .catch(fallbackError => {
+                        console.error("Error accessing the camera with default constraints: ", fallbackError);
+                    });
             });
     } else {
         console.error("No video devices found.");
