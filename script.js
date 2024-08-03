@@ -22,14 +22,32 @@ function isMobileDevice() {
 
 async function startCamera() {
     try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        const constraints = {
+            video: {
+                width: { ideal: 3840 },
+                height: { ideal: 2160 },
+                aspectRatio: { ideal: 16 / 9 }
+            }
+        };
 
-        if (videoDevices.length > 0) {
+        if (isMobileDevice()) {
+            constraints.video.aspectRatio = { ideal: 9 / 16 };
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        video.setAttribute('crossorigin', 'anonymous');
+
+        video.addEventListener('loadedmetadata', () => {
+            adjustCanvasSize();
+        });
+    } catch (error) {
+        console.warn("Preferred 4K resolution failed, falling back to 1080p:", error);
+        try {
             const constraints = {
                 video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
                     aspectRatio: { ideal: 16 / 9 }
                 }
             };
@@ -45,23 +63,31 @@ async function startCamera() {
             video.addEventListener('loadedmetadata', () => {
                 adjustCanvasSize();
             });
-        } else {
-            console.error("No video devices found.");
-        }
-    } catch (error) {
-        console.warn("Preferred constraints failed, falling back to default constraints:", error);
-        try {
-            const fallbackStream = await navigator.mediaDevices.getUserMedia({
-                video: true
-            });
-            video.srcObject = fallbackStream;
-            video.setAttribute('crossorigin', 'anonymous');
-
-            video.addEventListener('loadedmetadata', () => {
-                adjustCanvasSize();
-            });
         } catch (fallbackError) {
-            console.error("Error accessing the camera with default constraints:", fallbackError);
+            console.warn("Preferred 1080p resolution failed, falling back to 720p:", fallbackError);
+            try {
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        aspectRatio: { ideal: 16 / 9 }
+                    }
+                };
+
+                if (isMobileDevice()) {
+                    constraints.video.aspectRatio = { ideal: 9 / 16 };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                video.setAttribute('crossorigin', 'anonymous');
+
+                video.addEventListener('loadedmetadata', () => {
+                    adjustCanvasSize();
+                });
+            } catch (finalFallbackError) {
+                console.error("Error accessing the camera with all resolutions:", finalFallbackError);
+            }
         }
     }
 }
