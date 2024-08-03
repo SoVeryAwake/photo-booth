@@ -131,12 +131,22 @@ function captureImage() {
         context.save();
         context.translate(canvas.width / 2, canvas.height / 2);
         context.rotate(Math.PI / 2);
+        if (usingFrontCamera) {
+            context.scale(-1, 1);
+        }
         context.drawImage(video, -canvas.height / 2, -canvas.width / 2, canvas.height, canvas.width);
         context.restore();
     } else {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.save();
+        if (usingFrontCamera) {
+            context.scale(-1, 1);
+            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+        } else {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+        context.restore();
     }
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
