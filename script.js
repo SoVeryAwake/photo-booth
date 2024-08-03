@@ -56,6 +56,7 @@ captureButton.addEventListener('click', captureImage);
 sendEmailButton.addEventListener('click', () => {
     const email = emailInput.value;
     if (email) {
+        sendEmailButton.disabled = true; // Disable the button after click
         uploadAndSend(canvas, email);
     } else {
         alert('Please enter a valid email address.');
@@ -89,6 +90,7 @@ function resetProcess() {
     checkboxContainer.classList.add('hidden'); // Hide checkbox on reset
     captureButton.classList.remove('hidden');
     sendEmailButton.classList.add('hidden');
+    sendEmailButton.disabled = false; // Re-enable the send email button
     context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     emailInput.value = '';
     postToDiscordCheckbox.checked = true; // Ensure the checkbox is checked by default
@@ -133,6 +135,8 @@ function postToDiscordAndSendEmail(file, email) {
     })
     .catch(error => {
         console.error('Error posting to Discord:', error);
+        alert('Failed to post to Discord. Please try again.');
+        sendEmailButton.disabled = false; // Re-enable the button to allow retry
     });
 }
 
@@ -150,8 +154,12 @@ function sendEmailWithAttachment(file, email, discordUrl = '') {
         emailjs.send(SERVICE_ID, TEMPLATE_ID, emailParams, EMAILJS_USER_ID)
         .then((response) => {
             console.log('SUCCESS!', response.status, response.text);
+            alert('Email sent successfully!');
+            resetProcess(); // Automatically reset on success
         }, (error) => {
             console.error('FAILED...', error);
+            alert('Failed to send email. Please try again.');
+            sendEmailButton.disabled = false; // Re-enable the button to allow retry
         });
     };
 }
