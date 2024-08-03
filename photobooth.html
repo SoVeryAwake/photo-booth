@@ -12,10 +12,8 @@
         .buttons { display: flex; gap: 10px; margin: 10px; align-items: center; }
         button, select, input { padding: 10px 20px; font-size: 16px; cursor: pointer; }
         .hidden { display: none; }
-        .checkbox-container { display: flex; align-items: center; gap: 10px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -28,19 +26,9 @@
     </div>
     <div class="buttons">
         <button id="capture">Capture</button>
-        <input type="text" id="email" class="hidden" placeholder="Enter your email address">
-        <div id="checkbox-container" class="hidden">
-            <input type="checkbox" id="postToDiscord" checked>
-            <label for="postToDiscord">Post to Discord</label>
-        </div>
-        <button id="sendEmail" class="hidden">Send via Email</button>
-        <button id="reset" class="hidden">Reset</button>
+        <button id="postToDiscordButton" class="hidden">Post to Discord</button>
+        <button id="resetButton" class="hidden">Reset</button>
     </div>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("VIoYfu_KKNmMppsT8"); // Replace with your EmailJS user ID
-        })();
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
