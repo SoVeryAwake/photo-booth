@@ -17,7 +17,7 @@ async function startCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
+
         if (videoDevices.length > 0) {
             let constraints = {
                 video: {
@@ -29,14 +29,7 @@ async function startCamera() {
             };
 
             if (isMobileDevice()) {
-                constraints = {
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 720 },
-                        height: { ideal: 1280 },
-                        aspectRatio: { ideal: 9 / 16 }
-                    }
-                };
+                constraints.video.aspectRatio = { ideal: 9 / 16 };
                 video.style.height = 'auto';
                 video.style.width = '100%';
             }
@@ -44,7 +37,7 @@ async function startCamera() {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
             video.setAttribute('crossorigin', 'anonymous');
-            
+
             video.addEventListener('loadedmetadata', () => {
                 if (isMobileDevice()) {
                     canvas.width = video.videoHeight;
@@ -94,7 +87,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function captureImage() {
-    if (isMobileDevice()) {
+    if (isMobileDevice() && video.videoWidth > video.videoHeight) {
         context.save();
         context.translate(canvas.width / 2, canvas.height / 2);
         context.rotate(Math.PI / 2);
@@ -158,4 +151,3 @@ function dataURLtoFile(dataurl, filename) {
     }
     return new File([u8arr], filename, { type: mime });
 }
-``
