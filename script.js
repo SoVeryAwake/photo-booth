@@ -15,20 +15,29 @@ const SERVICE_ID = 'service_us2nq48';
 const TEMPLATE_ID = 'template_a7eb60m';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
-navigator.mediaDevices.getUserMedia({
-    video: {
-        width: { ideal: 3840 },
-        height: { ideal: 2160 },
-        aspectRatio: 16 / 9
+navigator.mediaDevices.enumerateDevices().then(devices => {
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    if (videoDevices.length > 0) {
+        const constraints = {
+            video: {
+                aspectRatio: 16 / 9,
+                width: { ideal: 3840 },
+                height: { ideal: 2160 }
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                video.srcObject = stream;
+                video.setAttribute('crossorigin', 'anonymous'); // Ensure the video is set to allow cross-origin
+            })
+            .catch(error => {
+                console.error("Error accessing the camera: ", error);
+            });
+    } else {
+        console.error("No video devices found.");
     }
-})
-    .then(stream => {
-        video.srcObject = stream;
-        video.setAttribute('crossorigin', 'anonymous'); // Ensure the video is set to allow cross-origin
-    })
-    .catch(error => {
-        console.error("Error accessing the camera: ", error);
-    });
+});
 
 captureButton.addEventListener('click', captureImage);
 
