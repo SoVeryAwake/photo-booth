@@ -15,38 +15,32 @@ const SERVICE_ID = 'service_us2nq48';
 const TEMPLATE_ID = 'template_a7eb60m';
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
-navigator.mediaDevices.enumerateDevices().then(devices => {
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    if (videoDevices.length > 0) {
-        const constraints = {
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                aspectRatio: 16 / 9
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                aspectRatio: { ideal: 16 / 9 }
             }
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-                video.srcObject = stream;
-                video.setAttribute('crossorigin', 'anonymous'); // Ensure the video is set to allow cross-origin
-            })
-            .catch(error => {
-                console.error("Error accessing the camera with the specified constraints: ", error);
-                // Fallback to default constraints if the specified constraints fail
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        video.srcObject = stream;
-                        video.setAttribute('crossorigin', 'anonymous');
-                    })
-                    .catch(fallbackError => {
-                        console.error("Error accessing the camera with default constraints: ", fallbackError);
-                    });
+        });
+        video.srcObject = stream;
+        video.setAttribute('crossorigin', 'anonymous');
+    } catch (error) {
+        console.warn("Preferred constraints failed, falling back to default constraints:", error);
+        try {
+            const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                video: true
             });
-    } else {
-        console.error("No video devices found.");
+            video.srcObject = fallbackStream;
+            video.setAttribute('crossorigin', 'anonymous');
+        } catch (fallbackError) {
+            console.error("Error accessing the camera with default constraints:", fallbackError);
+        }
     }
-});
+}
+
+startCamera();
 
 captureButton.addEventListener('click', captureImage);
 
