@@ -14,6 +14,10 @@ const resetModalButton = document.getElementById('resetModalButton');
 const welcomeModal = document.getElementById('welcomeModal');
 const welcomeButton = document.getElementById('welcomeButton');
 const swapCameraButton = document.getElementById('swapCameraButton');
+const recordingIndicator = document.getElementById('recordingIndicator');
+const videoPreviewModal = document.getElementById('videoPreviewModal');
+const videoPreview = document.getElementById('videoPreview');
+const closePreviewButton = document.getElementById('closePreviewButton');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
@@ -153,16 +157,28 @@ function startRecording() {
         }
     };
     mediaRecorder.start();
+    recordingIndicator.style.display = 'block';
 }
 
 function stopRecording() {
     mediaRecorder.stop();
     mediaRecorder.onstop = () => {
+        recordingIndicator.style.display = 'none';
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const file = new File([blob], 'video.webm', { type: 'video/webm' });
-        postVideoToDiscord(file);
+        previewVideo(blob);
     };
 }
+
+function previewVideo(blob) {
+    const url = URL.createObjectURL(blob);
+    videoPreview.src = url;
+    videoPreviewModal.style.display = 'flex';
+}
+
+closePreviewButton.addEventListener('click', () => {
+    videoPreviewModal.style.display = 'none';
+});
 
 function postVideoToDiscord(file) {
     const formData = new FormData();
