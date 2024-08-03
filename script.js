@@ -7,6 +7,7 @@ const resetButton = document.getElementById('resetButton');
 const videoContainer = document.querySelector('.video-container');
 const canvasContainer = document.querySelector('.canvas-container');
 const modal = document.getElementById('modal');
+const messageInput = document.getElementById('messageInput');
 const previewButton = document.getElementById('previewButton');
 const postToDiscordModalButton = document.getElementById('postToDiscordModalButton');
 const resetModalButton = document.getElementById('resetModalButton');
@@ -139,6 +140,11 @@ function postImageToDiscord() {
     const formData = new FormData();
     formData.append('file', file, 'image.png');
 
+    const message = messageInput.value;
+    if (message) {
+        formData.append('content', message);
+    }
+
     axios.post(DISCORD_WEBHOOK_URL, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
@@ -152,7 +158,7 @@ function postImageToDiscord() {
     })
     .catch(error => {
         console.error('Error posting to Discord:', error);
-        alert('Failed to post to Discord. Please try again.');
+        alert('Failed to post to Discord. Please try again.");
     });
 }
 
