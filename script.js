@@ -75,9 +75,13 @@ function adjustCanvasSize() {
 
 startCamera();
 
-captureButton.addEventListener('click', captureImage);
+captureButton.addEventListener('click', () => {
+    captureImage();
+    modal.style.display = 'flex';
+});
 video.addEventListener('click', () => {
     if (isMobileDevice()) {
+        captureImage();
         modal.style.display = 'flex';
     } else {
         captureImage();
@@ -87,11 +91,9 @@ postToDiscordButton.addEventListener('click', postImageToDiscord);
 resetButton.addEventListener('click', confirmReset);
 previewButton.addEventListener('click', () => {
     modal.style.display = 'none';
-    captureImage();
 });
 postToDiscordModalButton.addEventListener('click', () => {
     modal.style.display = 'none';
-    captureImage();
     postImageToDiscord();
 });
 resetModalButton.addEventListener('click', () => {
@@ -99,7 +101,7 @@ resetModalButton.addEventListener('click', () => {
     confirmReset();
 });
 canvas.addEventListener('click', () => {
-    if (canvasContainer.classList.contains('hidden') === false) {
+    if (!canvasContainer.classList.contains('hidden')) {
         modal.style.display = 'flex';
     }
 });
