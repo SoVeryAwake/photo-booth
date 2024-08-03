@@ -92,7 +92,20 @@ document.addEventListener('keydown', (event) => {
 
 function captureImage() {
     adjustCanvasSize();
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if (isMobileDevice() && video.videoWidth > video.videoHeight) {
+        canvas.width = video.videoHeight;
+        canvas.height = video.videoWidth;
+
+        context.save();
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate(Math.PI / 2);
+        context.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2, video.videoWidth, video.videoHeight);
+        context.restore();
+    } else {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+
     videoContainer.classList.add('hidden');
     canvasContainer.classList.remove('hidden');
     resetButton.classList.remove('hidden');
