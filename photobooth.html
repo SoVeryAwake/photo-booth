@@ -20,6 +20,7 @@
         .welcome-button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
         .swap-camera-button { position: absolute; bottom: 20px; left: 20px; background-color: rgba(255, 255, 255, 0.5); border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
         .flipped { transform: scaleX(-1); }
+        .countdown-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; color: white; font-size: 65vw; }
 
         @media (max-width: 768px) {
             body { height: 100vh; }
@@ -42,6 +43,7 @@
         <div class="canvas-container hidden">
             <canvas id="canvas" width="3840" height="2160"></canvas>
         </div>
+        <div id="countdown" class="countdown-overlay"></div>
     </div>
     <div class="buttons">
         <button id="capture">Capture</button>
