@@ -14,6 +14,7 @@ const resetModalButton = document.getElementById('resetModalButton');
 const welcomeModal = document.getElementById('welcomeModal');
 const welcomeButton = document.getElementById('welcomeButton');
 const swapCameraButton = document.getElementById('swapCameraButton');
+const countdownOverlay = document.getElementById('countdown');
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
 
@@ -28,10 +29,10 @@ async function startCamera() {
     const constraints = {
         video: {
             width: { ideal: 3840 },
-        height: { ideal: 2160 },
-        aspectRatio: { ideal: 16 / 9 },
-        facingMode: usingFrontCamera ? 'user' : 'environment'
-    }
+            height: { ideal: 2160 },
+            aspectRatio: { ideal: 16 / 9 },
+            facingMode: usingFrontCamera ? 'user' : 'environment'
+        }
     };
 
     if (isMobileDevice()) {
@@ -83,15 +84,13 @@ welcomeButton.addEventListener('click', () => {
 });
 
 captureButton.addEventListener('click', () => {
-    captureImage();
-    modal.style.display = 'flex';
+    startCountdown();
 });
 video.addEventListener('click', () => {
     if (isMobileDevice()) {
-        captureImage();
-        modal.style.display = 'flex';
+        startCountdown();
     } else {
-        captureImage();
+        startCountdown();
     }
 });
 postToDiscordButton.addEventListener('click', postImageToDiscord);
@@ -120,9 +119,27 @@ swapCameraButton.addEventListener('click', () => {
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
-        captureImage();
+        startCountdown();
     }
 });
+
+function startCountdown() {
+    let countdown = 3;
+    countdownOverlay.style.display = 'flex';
+    countdownOverlay.innerText = countdown;
+
+    const countdownInterval = setInterval(() => {
+        countdown -= 1;
+        if (countdown > 0) {
+            countdownOverlay.innerText = countdown;
+        } else {
+            clearInterval(countdownInterval);
+            countdownOverlay.style.display = 'none';
+            captureImage();
+            modal.style.display = 'flex';
+        }
+    }, 1000);
+}
 
 function captureImage() {
     if (isMobileDevice() && video.videoWidth > video.videoHeight) {
