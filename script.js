@@ -16,7 +16,7 @@ const welcomeButton = document.getElementById('welcomeButton');
 const swapCameraButton = document.getElementById('swapCameraButton');
 const countdownOverlay = document.getElementById('countdown');
 
-const DISCORD_WEBHOOK_URL_1 = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your first Discord webhook URL
+const DISCORD_WEBHOOK_URL_1 = 'https://discord.com/api/webhooks/1270553498760642704/Eh_uF2OCiF1WQoEsPZI5f23aQQ9QoZDcg6X4ppt9Ub82eKuj9TPvz3Q-vKNL2BdCw6Fj'; // Replace with your first Discord webhook URL
 const DISCORD_WEBHOOK_URL_2 = 'https://discord.com/api/webhooks/1269135084187942935/2YuH68ubNd7WL2J1UjPR7R3Y0bNDeNtSoUoahEq6crJRv4oXAjjucZtdoZQXs-N-e_GX'; // Replace with your second Discord webhook URL
 
 let currentStream;
