@@ -16,7 +16,8 @@ const welcomeButton = document.getElementById('welcomeButton');
 const swapCameraButton = document.getElementById('swapCameraButton');
 const countdownOverlay = document.getElementById('countdown');
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your Discord webhook URL
+const DISCORD_WEBHOOK_URL_1 = 'https://discord.com/api/webhooks/1269139070047621195/y1-bY0MITS4aXgJFwNYUN3-HX1cQmtqsieusfinmaRTOM0alYZcsC2rN7Xi_bjauyNWl'; // Replace with your first Discord webhook URL
+const DISCORD_WEBHOOK_URL_2 = 'https://discord.com/api/webhooks/1269135084187942935/2YuH68ubNd7WL2J1UjPR7R3Y0bNDeNtSoUoahEq6crJRv4oXAjjucZtdoZQXs-N-e_GX'; // Replace with your second Discord webhook URL
 
 let currentStream;
 let usingFrontCamera = true;
@@ -183,20 +184,24 @@ function postImageToDiscord() {
         formData.append('content', message);
     }
 
-    axios.post(DISCORD_WEBHOOK_URL, formData, {
+    postToDiscordWebhook(DISCORD_WEBHOOK_URL_1, formData)
+        .then(() => postToDiscordWebhook(DISCORD_WEBHOOK_URL_2, formData))
+        .then(() => {
+            alert('Posted to Discord successfully!');
+            const confirmReset = confirm("Do you want to reset the photo booth?");
+            if (confirmReset) resetProcess();
+        })
+        .catch(error => {
+            console.error('Error posting to Discord:', error);
+            alert('Failed to post to Discord. Please try again.');
+        });
+}
+
+function postToDiscordWebhook(webhookURL, formData) {
+    return axios.post(webhookURL, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         },
-    })
-    .then(response => {
-        console.log('Posted to Discord:', response.data);
-        alert('Posted to Discord successfully!');
-        const confirmReset = confirm("Do you want to reset the photo booth?");
-        if (confirmReset) resetProcess();
-    })
-    .catch(error => {
-        console.error('Error posting to Discord:', error);
-        alert('Failed to post to Discord. Please try again.');
     });
 }
 
