@@ -119,7 +119,7 @@ swapCameraButton.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'b') {
         startCountdown();
     }
 });
